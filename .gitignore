@@ -1,0 +1,6 @@
+.idea/
+caches/
+config.json
+*.db
+*.db-journal
+*.exe

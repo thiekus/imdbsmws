@@ -204,6 +204,40 @@
   <p><a href="https://github.com/thiekus/imdbsmws" target="_blank">IMDbSMWS v{{.AppVersion}}</a> - Copyright &copy; <a href="http://thiekus.com" target="_blank">Thiekus</a> 2019. Built using {{.GoVersion}} and SQLite {{.SQLiteVersion}}</p>
 </div>
 
+<!-- Preview Modal -->
+<div class="modal fade" id="modalPreviewTitle">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Deskripsi</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <!-- Modal body -->
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-4">
+            <img id="mdlPreviewImg" src="#" width="100%">
+          </div>
+          <div class="col-md-8">
+            <ul>
+              <li><strong>Title:</strong> <span id="mdlPreviewTitle"></span></li>
+              <li><strong>Original Title:</strong> <span id="mdlPreviewOriginalTitle"></span></li>
+              <li><strong>Type:</strong> <span id="mdlPreviewType"></span></li>
+              <li><strong>Genres:</strong> <span id="mdlPreviewGenres"></span></li>
+              <li><strong>Year:</strong> <span id="mdlPreviewYear"></span></li>
+              <li><strong>Release Date:</strong> <span id="mdlPreviewReleaseDate"></span></li>
+              <li><strong>Run Time:</strong> <span id="mdlPreviewRuntime"></span> Minutes</li>
+              <li><strong>Rating:</strong> <span id="mdlPreviewRating"></span></li>
+              <li><strong>Description:</strong> <p id="mdlPreviewDescription"></p></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 
   function showPage(pageName){
@@ -238,7 +272,7 @@
               var entry = data[x];
               var entryVal = "<tr>";
               entryVal += "<td><a href=\"https://www.imdb.com/title/"+entry.id+"/\" target=\"_blank\">"+entry.id+"</a></td>";
-              entryVal += "<td>"+entry.title+"</td>";
+              entryVal += "<td><a href=\"#\" onclick='showPreviewModal(\""+entry.id+"\")'>"+entry.title+"</a></td>";
               entryVal += "<td>"+entry.type+"</td>";
               entryVal += "<td>"+entry.genres+"</td>";
               entryVal += "<td>"+entry.year+"</td>";
@@ -283,6 +317,28 @@
       fail: function () {
         $("#moviesListSection").hide();
         $("#moviesStatusText").text("Gagal ketika melakukan pengambilan data dari database!");
+      }
+    });
+  }
+
+  function showPreviewModal(titleId) {
+    $.ajax({
+      type: "GET",
+      url: BASE_URL+"movies/"+titleId,
+      dataType: "json",
+      success: function (result) {
+        if (result.status === "success") {
+          $("#mdlPreviewImg").attr("src", result.data.imageUrl);
+          $("#mdlPreviewTitle").text(result.data.title);
+          $("#mdlPreviewOriginalTitle").text(result.data.originalTitle);
+          $("#mdlPreviewGenres").text(result.data.genres);
+          $("#mdlPreviewYear").text(result.data.year);
+          $("#mdlPreviewReleaseDate").text(result.data.releaseDate);
+          $("#mdlPreviewRuntime").text(result.data.runtimeMinutes);
+          $("#mdlPreviewRating").text(result.data.rating);
+          $("#mdlPreviewDescription").text(result.data.description);
+          $("#modalPreviewTitle").modal();
+        }
       }
     });
   }
