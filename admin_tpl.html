@@ -1,455 +1,457 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Thiekus IMDb WebService</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="{{.BaseUrl}}assets/css/bootstrap.min.css">
-  <script src="{{.BaseUrl}}assets/js/jquery-3.3.1.min.js"></script>
-  <script src="{{.BaseUrl}}assets/js/bootstrap.min.js"></script>
-  <style>
-    .footer {
-      position: fixed;
-      left: 0;
-      bottom: 0;
-      width: 100%;
-      background-color: lightgray;
-      padding-top: 16px;
-      text-align: center;
-    }
-  </style>
-  <script>
-    const BASE_URL = "{{.BaseUrl}}";
-  </script>
+    <title>Thiekus IMDb WebService</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{.BaseUrl}}assets/css/bootstrap.min.css">
+    <script src="{{.BaseUrl}}assets/js/jquery-3.3.1.min.js"></script>
+    <script src="{{.BaseUrl}}assets/js/bootstrap.min.js"></script>
+    <script src="{{.BaseUrl}}assets/js/notify.min.js"></script>
+    <style>
+        .footer {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: lightgray;
+            padding-top: 16px;
+            text-align: center;
+        }
+    </style>
+    <script>
+        const BASE_URL = "{{.BaseUrl}}";
+    </script>
 </head>
 <body>
 
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
-  <a class="navbar-brand" href="#">Thiekus IMDb WebService</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="collapsibleNavbar">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item menuMovies">
-        <a class="nav-link" href="#">Movie List</a>
-      </li>
-      <li class="nav-item menuImport">
-        <a class="nav-link" href="#">Import</a>
-      </li>
-      <li class="nav-item menuConfig">
-        <a class="nav-link" href="#">Konfigurasi</a>
-      </li>
-    </ul>
-    <ul class="navbar-nav">
-      <li class="nav-item">
-        <a class="nav-link" href="{{.BaseUrl}}logout">Logout</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="{{.BaseUrl}}shutdown">Shutdown</a>
-      </li>
-    </ul>
-  </div>
+    <a class="navbar-brand" href="#">Thiekus IMDb WebService</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="collapsibleNavbar">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item menuMovies">
+                <a class="nav-link" href="#">Movie List</a>
+            </li>
+            <li class="nav-item menuImport">
+                <a class="nav-link" href="#">Import</a>
+            </li>
+            <li class="nav-item menuConfig">
+                <a class="nav-link" href="#">Konfigurasi</a>
+            </li>
+        </ul>
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="{{.BaseUrl}}logout">Logout</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{.BaseUrl}}shutdown">Shutdown</a>
+            </li>
+        </ul>
+    </div>
 </nav>
 
 <div class="container" style="margin-top:30px">
-  <!-- Page untuk menampilkan data -->
-  <div id="pageMovies" class="row">
-    <div class="col">
-      <h2>Movie List</h2>
-      <p id="moviesStatusText">Silahkan lakukan pencarian pada form berikut</p>
-      <div class="row">
-        <div class="col-md-6">
-          <button type="button" class="btn btn-success">Tambah Baru</button>
+    <!-- Page untuk menampilkan data -->
+    <div id="pageMovies" class="row">
+        <div class="col">
+            <h2>Movie List</h2>
+            <p id="moviesStatusText">Silahkan lakukan pencarian pada form berikut</p>
+            <div class="row">
+                <div class="col-md-6">
+                    <button type="button" class="btn btn-success">Tambah Baru</button>
+                </div>
+                <div class="col-md-6">
+                    <form id="formMoviesSearch" action="#">
+                        <button id="btnMoviesSearch" type="button" class="btn btn-primary float-right" style="margin-left:8px">Search</button>
+                        <select class="form-control float-right" name="maxResult" style="width:80px;margin-left: 8px">
+                            <option value="10">10</option>
+                            <option value="20" selected>20</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="75">75</option>
+                            <option value="100">100</option>
+                        </select>
+                        <input id="edtPageNum" name="page" type="hidden" value="1">
+                        <input id="edtMovieTitle" class="form-control float-right" type="text" name="title" style="width:200px">
+                    </form>
+                </div>
+            </div>
+            <br>
+            <div id="moviesListSection" class="row" style="display: none">
+                <div class="col-md-12">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                        <tr>
+                            <th width="10%">#ID</th>
+                            <th width="30%">Title</th>
+                            <th width="10%">Type</th>
+                            <th width="10%">Genres</th>
+                            <th width="5%">Year</th>
+                            <th width="5%">Rating</th>
+                            <th width="15%">Length</th>
+                            <th width="15%">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody id="moviesTable">
+                        <!-- entri film disini -->
+                        </tbody>
+                    </table>
+                    <!-- Pagination -->
+                    <ul id="moviesPagination" class="pagination justify-content-end" style="margin:20px 0">
+                        <!-- <li class="page-item"><a class="page-link" href="#">Previous</a></li> -->
+                    </ul>
+                </div>
+            </div>
         </div>
-        <div class="col-md-6">
-          <form id="formMoviesSearch" action="#">
-            <button id="btnMoviesSearch" type="button" class="btn btn-primary float-right" style="margin-left:8px">Search</button>
-            <select class="form-control float-right" name="maxResult" style="width:80px;margin-left: 8px">
-              <option value="10">10</option>
-              <option value="20" selected>20</option>
-              <option value="25">25</option>
-              <option value="50">50</option>
-              <option value="75">75</option>
-              <option value="100">100</option>
-            </select>
-            <input id="edtPageNum" name="page" type="hidden" value="1">
-            <input id="edtMovieTitle" class="form-control float-right" type="text" name="title" style="width:200px">
-          </form>
-        </div>
-      </div>
-      <br>
-      <div id="moviesListSection" class="row" style="display: none">
-        <div class="col-md-12">
-          <table class="table table-bordered table-hover">
-            <thead>
-            <tr>
-              <th width="10%">#ID</th>
-              <th width="30%">Title</th>
-              <th width="10%">Type</th>
-              <th width="10%">Genres</th>
-              <th width="5%">Year</th>
-              <th width="5%">Rating</th>
-              <th width="15%">Length</th>
-              <th width="15%">Actions</th>
-            </tr>
-            </thead>
-            <tbody id="moviesTable">
-            <!-- entri film disini -->
-            </tbody>
-          </table>
-          <!-- Pagination -->
-          <ul id="moviesPagination" class="pagination justify-content-end" style="margin:20px 0">
-            <!-- <li class="page-item"><a class="page-link" href="#">Previous</a></li> -->
-          </ul>
-        </div>
-      </div>
     </div>
-  </div>
-  <!-- Page untuk import data -->
-  <div id="pageImport" class="row" style="display:none">
-    <div class="col">
-      <h2>Impor Database</h2>
-      <p>Download dan impor database dari datasets milik IMDb.
-          Untuk lebih jelas mengenai dataset ini, <a href="https://www.imdb.com/interfaces/" target="_blank">kunjungi halaman berikut</a>.</p>
-      <div id="sectionImportBegin" class="row">
-        <div class="col-md-6">
-          <form action="#" id="importForm">
-            <div class="form-group">
-              <label for="basicDataUrl">Basic Dataset URL:</label>
-              <input name="basicDataUrl" type="text" class="form-control" id="basicDataUrl" value="https://datasets.imdbws.com/title.basics.tsv.gz">
+    <!-- Page untuk import data -->
+    <div id="pageImport" class="row" style="display:none">
+        <div class="col">
+            <h2>Impor Database</h2>
+            <p>Download dan impor database dari datasets milik IMDb.
+                Untuk lebih jelas mengenai dataset ini, <a href="https://www.imdb.com/interfaces/" target="_blank">kunjungi halaman berikut</a>.</p>
+            <div id="sectionImportBegin" class="row">
+                <div class="col-md-6">
+                    <form action="#" id="importForm">
+                        <div class="form-group">
+                            <label for="basicDataUrl">Basic Dataset URL:</label>
+                            <input name="basicDataUrl" type="text" class="form-control" id="basicDataUrl" value="https://datasets.imdbws.com/title.basics.tsv.gz">
+                        </div>
+                        <div class="form-group">
+                            <label for="filterType">Include Type:</label>
+                            <input name="filterType" type="text" class="form-control" id="filterType" value="movie">
+                        </div>
+                        <div class="form-group">
+                            <label for="filterGenres">Include Genres:</label>
+                            <input name="filterGenres" type="text" class="form-control" id="filterGenres" value="action">
+                        </div>
+                        <div class="form-group">
+                            <label for="filterYearFrom">Include From Year:</label>
+                            <input name="filterYearFrom" type="number" class="form-control" id="filterYearFrom" value="2016">
+                        </div>
+                        <div class="form-group">
+                            <label for="filterYearTo">Include To Year:</label>
+                            <input name="filterYearTo" type="number" class="form-control" id="filterYearTo" value="2019">
+                        </div>
+                        <div class="form-group">
+                            <input type="checkbox" name="filterAdult" value="true"> Exclude adult contents
+                        </div>
+                        <div class="form-group">
+                            <input type="checkbox" name="saveCache" value="true" checked> Save cache
+                        </div>
+                        <div class="form-group">
+                            <input type="checkbox" name="useCache" value="true" checked> Use available cache (uncheck if you want to update)
+                        </div>
+                        <p>* For any filter, fill empty if you don't want use that filter</p>
+                        <button id="btnImport" type="button" class="btn btn-primary">Import</button>
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-              <label for="filterType">Include Type:</label>
-              <input name="filterType" type="text" class="form-control" id="filterType" value="movie">
+            <div id="sectionImportProcess" class="row" style="display: none">
+                <div class="col-md-12">
+                    <p id="importProgressStatus">Memproses...</p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="progress">
+                                <div id="importProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" style="width:0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-              <label for="filterGenres">Include Genres:</label>
-              <input name="filterGenres" type="text" class="form-control" id="filterGenres" value="action">
-            </div>
-            <div class="form-group">
-              <label for="filterYearFrom">Include From Year:</label>
-              <input name="filterYearFrom" type="number" class="form-control" id="filterYearFrom" value="2016">
-            </div>
-            <div class="form-group">
-              <label for="filterYearTo">Include To Year:</label>
-              <input name="filterYearTo" type="number" class="form-control" id="filterYearTo" value="2019">
-            </div>
-            <div class="form-group">
-              <input type="checkbox" name="filterAdult" value="true"> Exclude adult contents
-            </div>
-            <div class="form-group">
-              <input type="checkbox" name="saveCache" value="true" checked> Save cache
-            </div>
-            <div class="form-group">
-              <input type="checkbox" name="useCache" value="true" checked> Use available cache (uncheck if you want to update)
-            </div>
-            <p>* For any filter, fill empty if you don't want use that filter</p>
-            <button id="btnImport" type="button" class="btn btn-primary">Import</button>
-          </form>
         </div>
-      </div>
-      <div id="sectionImportProcess" class="row" style="display: none">
-        <div class="col-md-12">
-          <p id="importProgressStatus">Memproses...</p>
-          <div class="row">
-            <div class="col-md-6">
-              <div class="progress">
-                <div id="importProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" style="width:0%"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
-  </div>
-  <!-- Page untuk konfigurasi server -->
-  <div id="pageConfig" class="row" style="display:none">
-    <div class="col">
-      <h2>Konfigurasi</h2>
-      <div class="row">
-        <div class="col-md-6">
-          <form action="#" id="configForm">
-            <div class="form-group">
-              <label for="username">Username:</label>
-              <input name="username" type="text" class="form-control" id="username" value="{{.Config.Username}}">
+    <!-- Page untuk konfigurasi server -->
+    <div id="pageConfig" class="row" style="display:none">
+        <div class="col">
+            <h2>Konfigurasi</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <form action="#" id="configForm">
+                        <div class="form-group">
+                            <label for="username">Username:</label>
+                            <input name="username" type="text" class="form-control" id="username" value="{{.Config.Username}}">
+                        </div>
+                        <div class="form-group">
+                            <label for="pwd">Password:</label>
+                            <input name="password" type="password" class="form-control" id="pwd">
+                        </div>
+                        <div class="form-group">
+                            <label for="pwd">Masukan Kembali Password:</label>
+                            <input name="password2" type="password" class="form-control" id="pwd2">
+                        </div>
+                        <div class="form-group">
+                            <label for="sessionKey">Admin Session Key:</label>
+                            <input name="sessionKey" type="text" class="form-control" id="sessionKey" value="{{.Config.SessionKey}}">
+                        </div>
+                        <div class="form-group">
+                            <label for="port">Server Port:</label>
+                            <input name="port" type="number" class="form-control" id="port" value="{{.Config.ListeningPort}}">
+                        </div>
+                        <button id="btnConfigUpdate" type="button" class="btn btn-primary">Simpan</button>
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-              <label for="pwd">Password:</label>
-              <input name="password" type="password" class="form-control" id="pwd">
-            </div>
-            <div class="form-group">
-              <label for="pwd">Masukan Kembali Password:</label>
-              <input name="password2" type="password" class="form-control" id="pwd2">
-            </div>
-            <div class="form-group">
-              <label for="sessionKey">Admin Session Key:</label>
-              <input name="sessionKey" type="text" class="form-control" id="sessionKey" value="{{.Config.SessionKey}}">
-            </div>
-            <div class="form-group">
-              <label for="port">Server Port:</label>
-              <input name="port" type="number" class="form-control" id="port" value="{{.Config.ListeningPort}}">
-            </div>
-            <button id="btnConfigUpdate" type="button" class="btn btn-primary">Simpan</button>
-          </form>
         </div>
-      </div>
     </div>
-  </div>
 </div>
 
 <div style="height:72px"></div>
 
 <div class="footer text-center" style="margin-bottom:0">
-  <p><a href="https://github.com/thiekus/imdbsmws" target="_blank">IMDbSMWS v{{.AppVersion}}</a> - Copyright &copy; <a href="http://thiekus.com" target="_blank">Thiekus</a> 2019. Built using {{.GoVersion}} and SQLite {{.SQLiteVersion}}</p>
+    <p><a href="https://github.com/thiekus/imdbsmws" target="_blank">IMDbSMWS v{{.AppVersion}}</a> - Copyright &copy; <a href="http://thiekus.com" target="_blank">Thiekus</a> 2019. Built using {{.GoVersion}} and SQLite {{.SQLiteVersion}}</p>
 </div>
 
 <!-- Preview Modal -->
 <div class="modal fade" id="modalPreviewTitle">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content">
-      <!-- Modal Header -->
-      <div class="modal-header">
-        <h4 class="modal-title">Deskripsi</h4>
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-      </div>
-      <!-- Modal body -->
-      <div class="modal-body">
-        <div class="row">
-          <div class="col-md-4">
-            <img id="mdlPreviewImg" src="#" width="100%">
-          </div>
-          <div class="col-md-8">
-            <ul>
-              <li><strong>Title:</strong> <span id="mdlPreviewTitle"></span></li>
-              <li><strong>Original Title:</strong> <span id="mdlPreviewOriginalTitle"></span></li>
-              <li><strong>Type:</strong> <span id="mdlPreviewType"></span></li>
-              <li><strong>Genres:</strong> <span id="mdlPreviewGenres"></span></li>
-              <li><strong>Year:</strong> <span id="mdlPreviewYear"></span></li>
-              <li><strong>Release Date:</strong> <span id="mdlPreviewReleaseDate"></span></li>
-              <li><strong>Run Time:</strong> <span id="mdlPreviewRuntime"></span> Minutes</li>
-              <li><strong>Rating:</strong> <span id="mdlPreviewRating"></span></li>
-              <li><strong>Description:</strong> <p id="mdlPreviewDescription"></p></li>
-            </ul>
-          </div>
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Deskripsi</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <img id="mdlPreviewImg" src="#" width="100%">
+                    </div>
+                    <div class="col-md-8">
+                        <ul>
+                            <li><strong>Title:</strong> <span id="mdlPreviewTitle"></span></li>
+                            <li><strong>Original Title:</strong> <span id="mdlPreviewOriginalTitle"></span></li>
+                            <li><strong>Type:</strong> <span id="mdlPreviewType"></span></li>
+                            <li><strong>Genres:</strong> <span id="mdlPreviewGenres"></span></li>
+                            <li><strong>Year:</strong> <span id="mdlPreviewYear"></span></li>
+                            <li><strong>Release Date:</strong> <span id="mdlPreviewReleaseDate"></span></li>
+                            <li><strong>Run Time:</strong> <span id="mdlPreviewRuntime"></span> Minutes</li>
+                            <li><strong>Rating:</strong> <span id="mdlPreviewRating"></span></li>
+                            <li><strong>Description:</strong> <p id="mdlPreviewDescription"></p></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </div>
 
 <script>
 
-  function showPage(pageName){
-    $("#pageMovies").hide();
-    $("#pageImport").hide();
-    $("#pageConfig").hide();
-    $(".menuMovies").removeClass("active");
-    $(".menuImport").removeClass("active");
-    $(".menuConfig").removeClass("active");
-    $("#page"+pageName).show();
-    $(".menu"+pageName).addClass("active");
-  }
+    function showPage(pageName){
+        $("#pageMovies").hide();
+        $("#pageImport").hide();
+        $("#pageConfig").hide();
+        $(".menuMovies").removeClass("active");
+        $(".menuImport").removeClass("active");
+        $(".menuConfig").removeClass("active");
+        $("#page"+pageName).show();
+        $(".menu"+pageName).addClass("active");
+    }
 
-  function getMovieList(pageNum) {
-    $("#edtPageNum").val(pageNum);
-    var formData = $("#formMoviesSearch").serialize();
-    $.ajax({
-      type: "GET",
-      url: BASE_URL+"movies",
-      data: formData,
-      dataType: "json",
-      success: function (result) {
-        if (result.status === "success") {
-          var data = result.data;
-          var dataLen = result.count;
-          if (dataLen > 0) {
-            $("#moviesListSection").show();
-            var statusText = "Menampilkan "+dataLen+" entri dari "+result.totalCount;
-            $("#moviesStatusText").text(statusText);
-            var tableValue = "";
-            for (var x=0; x<dataLen; x++) {
-              var entry = data[x];
-              var entryVal = "<tr>";
-              entryVal += "<td><a href=\"https://www.imdb.com/title/"+entry.id+"/\" target=\"_blank\">"+entry.id+"</a></td>";
-              entryVal += "<td><a href=\"#\" onclick='showPreviewModal(\""+entry.id+"\")'>"+entry.title+"</a></td>";
-              entryVal += "<td>"+entry.type+"</td>";
-              entryVal += "<td>"+entry.genres+"</td>";
-              entryVal += "<td>"+entry.year+"</td>";
-              entryVal += "<td>"+entry.rating+"</td>";
-              entryVal += "<td>"+entry.runtimeMinutes+" Minutes</td>";
-              entryVal += "<td>"+
-                      "<button type=\"button\" class=\"btn btn-info btn-sm\">Edit</button> "+
-                      "<button type=\"button\" class=\"btn btn-danger btn-sm\">Hapus</button>"+
-                      "</td>";
-              entryVal += "</td>";
-              tableValue += entryVal;
+    function getMovieList(pageNum) {
+        $("#edtPageNum").val(pageNum);
+        var formData = $("#formMoviesSearch").serialize();
+        $.ajax({
+            type: "GET",
+            url: BASE_URL+"movies",
+            data: formData,
+            dataType: "json",
+            success: function (result) {
+                if (result.status === "success") {
+                    var data = result.data;
+                    var dataLen = result.count;
+                    if (dataLen > 0) {
+                        $("#moviesListSection").show();
+                        var statusText = "Menampilkan "+dataLen+" entri dari "+result.totalCount;
+                        $("#moviesStatusText").text(statusText);
+                        var tableValue = "";
+                        for (var x=0; x<dataLen; x++) {
+                            var entry = data[x];
+                            var entryVal = "<tr>";
+                            entryVal += "<td><a href=\"https://www.imdb.com/title/"+entry.id+"/\" target=\"_blank\">"+entry.id+"</a></td>";
+                            entryVal += "<td><a href=\"#\" onclick='showPreviewModal(\""+entry.id+"\")'>"+entry.title+"</a></td>";
+                            entryVal += "<td>"+entry.type+"</td>";
+                            entryVal += "<td>"+entry.genres+"</td>";
+                            entryVal += "<td>"+entry.year+"</td>";
+                            entryVal += "<td>"+entry.rating+"</td>";
+                            entryVal += "<td>"+entry.runtimeMinutes+" Minutes</td>";
+                            entryVal += "<td>"+
+                                "<button type=\"button\" class=\"btn btn-info btn-sm\">Edit</button> "+
+                                "<button type=\"button\" class=\"btn btn-danger btn-sm\">Hapus</button>"+
+                                "</td>";
+                            entryVal += "</td>";
+                            tableValue += entryVal;
+                        }
+                        $("#moviesTable").html(tableValue);
+                        var pageLinks = "";
+                        if (result.page > 1) {
+                            var lastPage = result.page - 1;
+                            pageLinks += "<li class=\"page-item\"><a class=\"page-link\" href=\"#\" onclick='getMovieList("+lastPage+")'>Previous</a></li>";
+                        }
+                        var revPageLinks = "";
+                        for (var y=result.page-1; y>=1 && y>=result.page-2; y--) {
+                            revPageLinks = "<li class=\"page-item\"><a class=\"page-link\" href=\"#\" onclick='getMovieList("+y+")'>"+y+"</a></li>" + revPageLinks;
+                        }
+                        pageLinks += revPageLinks;
+                        pageLinks += "<li class=\"page-item\"><a class=\"page-link\" href=\"#\" onclick='getMovieList("+result.page+")'><strong>"+result.page+"</strong></a></li>";
+                        for (y=result.page+1; y<=result.maxPage && y<=result.page+2; y++) {
+                            pageLinks += "<li class=\"page-item\"><a class=\"page-link\" href=\"#\" onclick='getMovieList("+y+")'>"+y+"</a></li>";
+                        }
+                        if (result.page < result.maxPage) {
+                            var nextPage = result.page + 1;
+                            pageLinks += "<li class=\"page-item\"><a class=\"page-link\" href=\"#\" onclick='getMovieList("+nextPage+")'>Next</a></li>";
+                        }
+                        $("#moviesPagination").html(pageLinks);
+                    } else {
+                        $("#moviesListSection").hide();
+                        $("#moviesStatusText").text("Data tidak ditemukan!");
+                    }
+                } else {
+                    $("#moviesListSection").hide();
+                    $("#moviesStatusText").text("Data tidak ditemukan!");
+                }
+            },
+            fail: function () {
+                $("#moviesListSection").hide();
+                $("#moviesStatusText").text("Gagal ketika melakukan pengambilan data dari database!");
             }
-            $("#moviesTable").html(tableValue);
-            var pageLinks = "";
-            if (result.page > 1) {
-              var lastPage = result.page - 1;
-              pageLinks += "<li class=\"page-item\"><a class=\"page-link\" href=\"#\" onclick='getMovieList("+lastPage+")'>Previous</a></li>";
+        });
+    }
+
+    function showPreviewModal(titleId) {
+        $.ajax({
+            type: "GET",
+            url: BASE_URL+"movies/"+titleId,
+            dataType: "json",
+            success: function (result) {
+                if (result.status === "success") {
+                    $("#mdlPreviewImg").attr("src", result.data.imageUrl);
+                    $("#mdlPreviewTitle").text(result.data.title);
+                    $("#mdlPreviewOriginalTitle").text(result.data.originalTitle);
+                    $("#mdlPreviewType").text(result.data.type);
+                    $("#mdlPreviewGenres").text(result.data.genres);
+                    $("#mdlPreviewYear").text(result.data.year);
+                    $("#mdlPreviewReleaseDate").text(result.data.releaseDate);
+                    $("#mdlPreviewRuntime").text(result.data.runtimeMinutes);
+                    $("#mdlPreviewRating").text(result.data.rating);
+                    $("#mdlPreviewDescription").text(result.data.description);
+                    $("#modalPreviewTitle").modal();
+                }
             }
-            var revPageLinks = "";
-            for (var y=result.page-1; y>=1 && y>=result.page-2; y--) {
-              revPageLinks = "<li class=\"page-item\"><a class=\"page-link\" href=\"#\" onclick='getMovieList("+y+")'>"+y+"</a></li>" + revPageLinks;
+        });
+    }
+
+    function refreshImportStatus() {
+        $.ajax({
+            type: "GET",
+            url: BASE_URL+"importStatus",
+            dataType: "json",
+            success: function (status) {
+                var statusText = status.statusText;
+                var progress = status.progress;
+                $("#importProgressStatus").text(statusText+" - ("+progress+"%)");
+                var progressBar = $("#importProgressBar");
+                progressBar.css("width", progress+"%");
+                if (status.running) {
+                    setTimeout(refreshImportStatus, 1000);
+                } else {
+                    progressBar.removeClass("bg-success");
+                    progressBar.removeClass("bg-danger");
+                    if (status["success"]) {
+                        progressBar.addClass("bg-success");
+                    } else {
+                        progressBar.addClass("bg-danger");
+                    }
+                }
+            },
+            fail: function () {
+                $("#importProgressStatus").text("Failed to get importStatus!");
+                setTimeout(refreshImportStatus, 3000);
             }
-            pageLinks += revPageLinks;
-            pageLinks += "<li class=\"page-item\"><a class=\"page-link\" href=\"#\" onclick='getMovieList("+result.page+")'><strong>"+result.page+"</strong></a></li>";
-            for (var y=result.page+1; y<=result.maxPage && y<=result.page+2; y++) {
-              pageLinks += "<li class=\"page-item\"><a class=\"page-link\" href=\"#\" onclick='getMovieList("+y+")'>"+y+"</a></li>";
+        })
+    }
+
+    function sendImportCommand(formData){
+        $.ajax({
+            type: "POST",
+            url: BASE_URL+"admin/importDatabase",
+            data: formData,
+            success: function (result) {
+                if (result === "OK"){
+                    $("#sectionImportBegin").hide();
+                    $("#sectionImportProcess").show();
+                    var progressBar = $("#importProgressBar");
+                    progressBar.removeClass("bg-success");
+                    progressBar.removeClass("bg-danger");
+                    refreshImportStatus();
+                } else {
+                    alert("Gagal mengirimkan perintah untuk import!");
+                }
+            },
+            fail: function () {
+                alert("Connection error when requesting import!");
             }
-            if (result.page < result.maxPage) {
-              var nextPage = result.page + 1;
-              pageLinks += "<li class=\"page-item\"><a class=\"page-link\" href=\"#\" onclick='getMovieList("+nextPage+")'>Next</a></li>";
+        });
+    }
+
+    function sendConfigChanges(formData){
+        $.ajax({
+            type: "POST",
+            url: BASE_URL+"admin/updateConfig",
+            data: formData,
+            success: function (result) {
+                if (result === "OK"){
+                    alert("Berhasil mengubah konfigurasi!");
+                } else {
+                    alert("Gagal mengubah konfigurasi!");
+                }
             }
-            $("#moviesPagination").html(pageLinks);
-          } else {
-            $("#moviesListSection").hide();
-            $("#moviesStatusText").text("Data tidak ditemukan!");
-          }
-        } else {
-          $("#moviesListSection").hide();
-          $("#moviesStatusText").text("Data tidak ditemukan!");
-        }
-      },
-      fail: function () {
-        $("#moviesListSection").hide();
-        $("#moviesStatusText").text("Gagal ketika melakukan pengambilan data dari database!");
-      }
-    });
-  }
+        });
+    }
 
-  function showPreviewModal(titleId) {
-    $.ajax({
-      type: "GET",
-      url: BASE_URL+"movies/"+titleId,
-      dataType: "json",
-      success: function (result) {
-        if (result.status === "success") {
-          $("#mdlPreviewImg").attr("src", result.data.imageUrl);
-          $("#mdlPreviewTitle").text(result.data.title);
-          $("#mdlPreviewOriginalTitle").text(result.data.originalTitle);
-          $("#mdlPreviewGenres").text(result.data.genres);
-          $("#mdlPreviewYear").text(result.data.year);
-          $("#mdlPreviewReleaseDate").text(result.data.releaseDate);
-          $("#mdlPreviewRuntime").text(result.data.runtimeMinutes);
-          $("#mdlPreviewRating").text(result.data.rating);
-          $("#mdlPreviewDescription").text(result.data.description);
-          $("#modalPreviewTitle").modal();
-        }
-      }
+    $(function () {
+        // Setting pages click event
+        $(".menuMovies").click(function () {
+            showPage("Movies");
+        });
+        $(".menuImport").click(function () {
+            showPage("Import");
+        });
+        $(".menuConfig").click(function () {
+            showPage("Config");
+        });
+        //
+        $("#btnMoviesSearch").click(function () {
+            getMovieList(1);
+        });
+        // Tombol import di menu import
+        $("#btnImport").click(function () {
+            sendImportCommand($("#importForm").serialize());
+        });
+        // Update konfigurasi
+        $("#btnConfigUpdate").click(function () {
+            var username = $("#username").val();
+            if (username === ""){
+                alert("Masukkan username!");
+                return;
+            }
+            var password = $("#pwd").val();
+            var password2 = $("#pwd2").val();
+            if (password !== password2) {
+                alert("Password yang mau diganti tidak sama!");
+                return;
+            }
+            sendConfigChanges($("#configForm").serialize());
+        });
+        // Default show to ListData
+        showPage("Movies");
+        // Fetch for first time
+        getMovieList(1);
     });
-  }
-
-  function refreshImportStatus() {
-    $.ajax({
-      type: "GET",
-      url: BASE_URL+"importStatus",
-      dataType: "json",
-      success: function (status) {
-        var statusText = status.statusText;
-        var progress = status.progress;
-        $("#importProgressStatus").text(statusText+" - ("+progress+"%)");
-        var progressBar = $("#importProgressBar");
-        progressBar.css("width", progress+"%");
-        if (status.running) {
-          setTimeout(refreshImportStatus, 1000);
-        } else {
-          progressBar.removeClass("bg-success");
-          progressBar.removeClass("bg-danger");
-          if (status["success"]) {
-            progressBar.addClass("bg-success");
-          } else {
-            progressBar.addClass("bg-danger");
-          }
-        }
-      },
-      fail: function () {
-        $("#importProgressStatus").text("Failed to get importStatus!");
-        setTimeout(refreshImportStatus, 3000);
-      }
-    })
-  }
-
-  function sendImportCommand(formData){
-    $.ajax({
-      type: "POST",
-      url: BASE_URL+"admin/importDatabase",
-      data: formData,
-      success: function (result) {
-        if (result === "OK"){
-          $("#sectionImportBegin").hide();
-          $("#sectionImportProcess").show();
-          var progressBar = $("#importProgressBar");
-          progressBar.removeClass("bg-success");
-          progressBar.removeClass("bg-danger");
-          refreshImportStatus();
-        } else {
-          alert("Gagal mengirimkan perintah untuk import!");
-        }
-      },
-      fail: function () {
-       alert("Connection error when requesting import!");
-      }
-    });
-  }
-
-  function sendConfigChanges(formData){
-    $.ajax({
-      type: "POST",
-      url: BASE_URL+"admin/updateConfig",
-      data: formData,
-      success: function (result) {
-        if (result === "OK"){
-          alert("Berhasil mengubah konfigurasi!");
-        } else {
-          alert("Gagal mengubah konfigurasi!");
-        }
-      }
-    });
-  }
-
-  $(function () {
-    // Setting pages click event
-    $(".menuMovies").click(function () {
-      showPage("Movies");
-    });
-    $(".menuImport").click(function () {
-      showPage("Import");
-    });
-    $(".menuConfig").click(function () {
-      showPage("Config");
-    });
-    //
-    $("#btnMoviesSearch").click(function () {
-      getMovieList(1);
-    });
-    // Tombol import di menu import
-    $("#btnImport").click(function () {
-      sendImportCommand($("#importForm").serialize());
-    });
-    // Update konfigurasi
-    $("#btnConfigUpdate").click(function () {
-      var username = $("#username").val();
-      if (username === ""){
-        alert("Masukkan username!");
-        return;
-      }
-      var password = $("#password").val();
-      var password2 = $("#password2").val();
-      if (password !== password2) {
-        alert("Password yang mau diganti tidak sama!");
-        return;
-      }
-      sendConfigChanges($("#configForm").serialize());
-    });
-    // Default show to ListData
-    showPage("Movies");
-    // Fetch for first time
-    getMovieList(1);
-  });
 
 </script>
 
