@@ -14,12 +14,13 @@ import (
 	"time"
 )
 
-const appVersion = "0.1.1"
+const appVersion = "0.1.2"
 
 var appConfig ConfigData
 var appServer http.Server
 var appServerVer = fmt.Sprintf("ThkTwinkle %s", appVersion)
 var appCookieStore *sessions.CookieStore
+var appOnShutdown = false
 
 // Endpoint to perform application shutdown from http request.
 // Needs authentication to admin user.
@@ -28,6 +29,7 @@ func shutdownEndpoint(w http.ResponseWriter, r *http.Request) {
 	if checkAdminAuth(r) {
 		log := newLog()
 		log.Print("Requesting shutdown...")
+		appOnShutdown = true
 		go func() {
 			time.Sleep(5000 * time.Millisecond)
 			log.Print("Shutting down...")
@@ -45,6 +47,11 @@ func shutdownEndpoint(w http.ResponseWriter, r *http.Request) {
 func appMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log := newLog()
+		if appOnShutdown {
+			log.Printf("Request for client %s to %s rejected on shutdown", r.RemoteAddr, r.URL.Path)
+			http.Error(w, "Internal server error: server on shutdown", http.StatusInternalServerError)
+			return
+		}
 		if !strings.HasPrefix(r.URL.Path, "/importStatus") {
 			log.Printf("Client %s accessing %s", r.RemoteAddr, r.URL.Path)
 		}
