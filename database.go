@@ -12,19 +12,19 @@ type ImdbDb struct {
 }
 
 type ImdbTitleEntry struct {
-	Id             string    `json:"id"`
-	LastUpdate     string    `json:"lastUpdate"`
-	Type           string    `json:"type"`
-	Title          string    `json:"title"`
-	OriginalTitle  string    `json:"originalTitle"`
-	Genres         string    `json:"genres"`
-	Year           int       `json:"year"`
-	ReleaseDate    string    `json:"releaseDate"`
-	RuntimeMinutes int       `json:"runtimeMinutes"`
-	IsAdult        bool      `json:"isAdult"`
-	Rating         float64   `json:"rating"`
-	Description    string    `json:"description"`
-	ImageUrl       string    `json:"imageUrl"`
+	Id             string  `json:"id"`
+	LastUpdate     string  `json:"lastUpdate"`
+	Type           string  `json:"type"`
+	Title          string  `json:"title"`
+	OriginalTitle  string  `json:"originalTitle"`
+	Genres         string  `json:"genres"`
+	Year           int     `json:"year"`
+	ReleaseDate    string  `json:"releaseDate"`
+	RuntimeMinutes int     `json:"runtimeMinutes"`
+	IsAdult        bool    `json:"isAdult"`
+	Rating         float64 `json:"rating"`
+	Description    string  `json:"description"`
+	ImageUrl       string  `json:"imageUrl"`
 }
 
 type ImdbTitleSearchFilter struct {
@@ -38,8 +38,8 @@ type ImdbTitleSearchFilter struct {
 const DefaultDatabasePath = "./imdb.db"
 
 func OpenDatabase(path string) (ImdbDb, error) {
-	i:= ImdbDb{}
-	db, err:= sql.Open("sqlite3", path)
+	i := ImdbDb{}
+	db, err := sql.Open("sqlite3", path)
 	if err != nil {
 		return i, err
 	}
@@ -54,12 +54,12 @@ func OpenDefaultDatabase() (ImdbDb, error) {
 func CreateDatabase(path string, deleteDb bool) (ImdbDb, error) {
 	if deleteDb {
 		if isFileExists(DefaultDatabasePath) {
-			if err:= os.Remove(DefaultDatabasePath); err != nil {
+			if err := os.Remove(DefaultDatabasePath); err != nil {
 				return ImdbDb{}, err
 			}
 		}
 	}
-	i, err:= OpenDatabase(path)
+	i, err := OpenDatabase(path)
 	if err != nil {
 		return i, err
 	}
@@ -107,7 +107,7 @@ func (i *ImdbDb) Db() *sql.DB {
 }
 
 func (i *ImdbDb) PrepareInsertTitle() (*sql.Stmt, error) {
-	insertSql:= `
+	insertSql := `
     INSERT INTO titles (
         id,
         lastUpdate,
@@ -149,7 +149,7 @@ func (i *ImdbDb) InsertTitle(stmt *sql.Stmt, entry ImdbTitleEntry) error {
 }
 
 func (i *ImdbDb) InsertTitleOnce(entry ImdbTitleEntry) error {
-	stmt, err:= i.PrepareInsertTitle()
+	stmt, err := i.PrepareInsertTitle()
 	if err != nil {
 		return err
 	}
@@ -162,9 +162,9 @@ func (i *ImdbDb) InsertTitleOnce(entry ImdbTitleEntry) error {
 }
 
 func (i *ImdbDb) GetTitlesCount(title string) int {
-	count:= 0
-	queryStr:= `SELECT COUNT(id) FROM titles WHERE title LIKE ?;`
-	stmt, err:= i.db.Prepare(queryStr)
+	count := 0
+	queryStr := `SELECT COUNT(id) FROM titles WHERE title LIKE ?;`
+	stmt, err := i.db.Prepare(queryStr)
 	if err != nil {
 		return count
 	}
@@ -179,8 +179,8 @@ func (i *ImdbDb) GetTitlesCount(title string) int {
 
 func (i *ImdbDb) GetTitles(filter ImdbTitleSearchFilter) ([]ImdbTitleEntry, error) {
 	var entries []ImdbTitleEntry = nil
-	queryStr:= `SELECT * FROM titles WHERE title LIKE ? ORDER BY title ASC LIMIT ? OFFSET ?;`
-	stmt, err:= i.db.Prepare(queryStr)
+	queryStr := `SELECT * FROM titles WHERE title LIKE ? ORDER BY year DESC, releaseDate DESC, title ASC LIMIT ? OFFSET ?;`
+	stmt, err := i.db.Prepare(queryStr)
 	if err != nil {
 		return entries, err
 	}
@@ -192,15 +192,15 @@ func (i *ImdbDb) GetTitles(filter ImdbTitleSearchFilter) ([]ImdbTitleEntry, erro
 	if filter.SortBy == "" {
 		filter.SortBy = "title"
 	}
-	offset:= (filter.Page-1) * filter.MaxResult
-	title:= filter.Title + "%"
-	rows, err:= stmt.Query(title, filter.MaxResult, offset)
+	offset := (filter.Page - 1) * filter.MaxResult
+	title := filter.Title + "%"
+	rows, err := stmt.Query(title, filter.MaxResult, offset)
 	if err != nil {
 		return entries, err
 	}
 	for rows.Next() {
-		entry:= ImdbTitleEntry{}
-		err:= rows.Scan(
+		entry := ImdbTitleEntry{}
+		err := rows.Scan(
 			&entry.Id,
 			&entry.LastUpdate,
 			&entry.Type,
@@ -214,22 +214,22 @@ func (i *ImdbDb) GetTitles(filter ImdbTitleSearchFilter) ([]ImdbTitleEntry, erro
 			&entry.Rating,
 			&entry.Description,
 			&entry.ImageUrl,
-			)
+		)
 		if err != nil {
 			return entries, err
 		}
 		entries = append(entries, entry)
 	}
-	if err:= rows.Err(); err != nil {
+	if err := rows.Err(); err != nil {
 		return entries, err
 	}
 	return entries, nil
 }
 
 func (i *ImdbDb) GetTitleById(id string) (ImdbTitleEntry, error) {
-	entry:= ImdbTitleEntry{}
-	queryStr:= `SELECT * FROM titles WHERE id=?;`
-	stmt, err:= i.db.Prepare(queryStr)
+	entry := ImdbTitleEntry{}
+	queryStr := `SELECT * FROM titles WHERE id=?;`
+	stmt, err := i.db.Prepare(queryStr)
 	if err != nil {
 		return entry, err
 	}
@@ -248,12 +248,12 @@ func (i *ImdbDb) GetTitleById(id string) (ImdbTitleEntry, error) {
 		&entry.Rating,
 		&entry.Description,
 		&entry.ImageUrl,
-		)
+	)
 	return entry, err
 }
 
 func (i *ImdbDb) UpdateTitle(entry ImdbTitleEntry) error {
-	queryStr:= `
+	queryStr := `
     UPDATE titles 
     SET
         lastUpdate=?,
@@ -269,7 +269,7 @@ func (i *ImdbDb) UpdateTitle(entry ImdbTitleEntry) error {
         description=?,
         imageUrl=?
     WHERE id=?;`
-	stmt, err:= i.db.Prepare(queryStr)
+	stmt, err := i.db.Prepare(queryStr)
 	if err != nil {
 		return err
 	}
@@ -294,8 +294,8 @@ func (i *ImdbDb) UpdateTitle(entry ImdbTitleEntry) error {
 }
 
 func (i *ImdbDb) DeleteEntry(id string) error {
-	queryStr:= `DELETE FROM titles WHERE id=?`
-	stmt, err:= i.db.Prepare(queryStr)
+	queryStr := `DELETE FROM titles WHERE id=?`
+	stmt, err := i.db.Prepare(queryStr)
 	if err != nil {
 		return err
 	}

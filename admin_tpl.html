@@ -18,6 +18,23 @@
             padding-top: 16px;
             text-align: center;
         }
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        .scrollEditBox {
+            height:450px;
+            overflow-y: scroll;
+        }
     </style>
     <script>
         const BASE_URL = "{{.BaseUrl}}";
@@ -26,7 +43,7 @@
 <body>
 
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
-    <a class="navbar-brand" href="#">Thiekus IMDb WebService</a>
+    <span id="topTitle" class="navbar-brand">Thiekus IMDb WebService</span>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -61,10 +78,10 @@
             <p id="moviesStatusText">Silahkan lakukan pencarian pada form berikut</p>
             <div class="row">
                 <div class="col-md-6">
-                    <button type="button" class="btn btn-success">Tambah Baru</button>
+                    <button type="button" class="btn btn-success" onclick="showAddModal()">Tambah Baru</button>
                 </div>
                 <div class="col-md-6">
-                    <form id="formMoviesSearch" action="#">
+                    <span id="formMoviesSearch">
                         <button id="btnMoviesSearch" type="button" class="btn btn-primary float-right" style="margin-left:8px">Search</button>
                         <select class="form-control float-right" name="maxResult" style="width:80px;margin-left: 8px">
                             <option value="10">10</option>
@@ -76,7 +93,7 @@
                         </select>
                         <input id="edtPageNum" name="page" type="hidden" value="1">
                         <input id="edtMovieTitle" class="form-control float-right" type="text" name="title" style="width:200px">
-                    </form>
+                    </span>
                 </div>
             </div>
             <br>
@@ -239,7 +256,112 @@
     </div>
 </div>
 
+<!-- Add/Edit Modal -->
+<div class="modal fade" id="modalAddOrEditTitle">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 id="mdlAddOrEditTitle" class="modal-title">Tambah Entri</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body scrollEditBox">
+                <div id="formAddOrEdit">
+                    <div class="form-group">
+                        <label for="mdlEditId">ID:</label>
+                        <input name="id" type="text" class="form-control" id="mdlEditId">
+                    </div>
+                    <div class="form-group">
+                        <label for="mdlEditType">Type:</label>
+                        <input name="type" type="text" class="form-control" id="mdlEditType">
+                    </div>
+                    <div class="form-group">
+                        <label for="mdlEditTitle">Title:</label>
+                        <input name="title" type="text" class="form-control" id="mdlEditTitle">
+                    </div>
+                    <div class="form-group">
+                        <label for="mdlEditOriginalTitle">Original Title:</label>
+                        <input name="originalTitle" type="text" class="form-control" id="mdlEditOriginalTitle">
+                    </div>
+                    <div class="form-group">
+                        <label for="mdlEditGenres">Genres:</label>
+                        <input name="genres" type="text" class="form-control" id="mdlEditGenres">
+                    </div>
+                    <div class="form-group">
+                        <label for="mdlEditYear">Year:</label>
+                        <input name="year" type="text" class="form-control" id="mdlEditYear">
+                    </div>
+                    <div class="form-group">
+                        <label for="mdlEditReleaseDate">Release Date:</label>
+                        <input name="releaseDate" type="text" class="form-control" id="mdlEditReleaseDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="mdlEditRuntimeMinutes">Runtime Minutes:</label>
+                        <input name="runtimeMinutes" type="text" class="form-control" id="mdlEditRuntimeMinutes">
+                    </div>
+                    <div class="form-group">
+                        <label for="mdlEditRating">Rating:</label>
+                        <input name="rating" type="text" class="form-control" id="mdlEditRating">
+                    </div>
+                    <div class="form-group">
+                        <label for="mdlEditDescription">Description:</label>
+                        <textarea name="description" type="text" class="form-control" id="mdlEditDescription" style="height:90px;"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="mdlEditImageUrl">Image URL:</label>
+                        <input name="imageUrl" type="text" class="form-control" id="mdlEditImageUrl">
+                    </div>
+                </div>
+            </div>
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" id="btnAddOrEditConfirm" class="btn btn-success" data-dismiss="modal">Simpan</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="modalDeleteTitle">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Konfirmasi Hapus</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body">
+                <p>Apakah anda yakin ingin menghapus entri ini?</p>
+            </div>
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" id="btnDeleteConfirm" class="btn btn-danger" data-dismiss="modal">Hapus</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+
+    function notifySuccess(message){
+        $.notify(message, "success");
+    }
+
+    function notifyInfo(message){
+        $.notify(message, "info");
+    }
+
+    function notifyWarning(message){
+        $.notify(message, "warn");
+    }
+
+    function notifyError(message){
+        $.notify(message, "error");
+    }
 
     function showPage(pageName){
         $("#pageMovies").hide();
@@ -254,7 +376,8 @@
 
     function getMovieList(pageNum) {
         $("#edtPageNum").val(pageNum);
-        var formData = $("#formMoviesSearch").serialize();
+        var inputs = $("#formMoviesSearch").clone();
+        var formData = $("<form>").append(inputs).serialize();
         $.ajax({
             type: "GET",
             url: BASE_URL+"movies",
@@ -272,7 +395,7 @@
                         for (var x=0; x<dataLen; x++) {
                             var entry = data[x];
                             var entryVal = "<tr>";
-                            entryVal += "<td><a href=\"https://www.imdb.com/title/"+entry.id+"/\" target=\"_blank\">"+entry.id+"</a></td>";
+                            entryVal += "<td class=\"text-monospace\"><a href=\"https://www.imdb.com/title/"+entry.id+"/\" target=\"_blank\">"+entry.id+"</a></td>";
                             entryVal += "<td><a href=\"#\" onclick='showPreviewModal(\""+entry.id+"\")'>"+entry.title+"</a></td>";
                             entryVal += "<td>"+entry.type+"</td>";
                             entryVal += "<td>"+entry.genres+"</td>";
@@ -280,8 +403,8 @@
                             entryVal += "<td>"+entry.rating+"</td>";
                             entryVal += "<td>"+entry.runtimeMinutes+" Minutes</td>";
                             entryVal += "<td>"+
-                                "<button type=\"button\" class=\"btn btn-info btn-sm\">Edit</button> "+
-                                "<button type=\"button\" class=\"btn btn-danger btn-sm\">Hapus</button>"+
+                                "<button type=\"button\" class=\"btn btn-info btn-sm\" onclick='showEditModal(\""+entry.id+"\")'>Edit</button> "+
+                                "<button type=\"button\" class=\"btn btn-danger btn-sm\" onclick='showDeleteConfirmationModal(\""+entry.id+"\")'>Hapus</button>"+
                                 "</td>";
                             entryVal += "</td>";
                             tableValue += entryVal;
@@ -308,16 +431,85 @@
                         $("#moviesPagination").html(pageLinks);
                     } else {
                         $("#moviesListSection").hide();
-                        $("#moviesStatusText").text("Data tidak ditemukan!");
+                        var errMsg = "Data tidak ditemukan!";
+                        $("#moviesStatusText").text(errMsg);
+                        notifyError(errMsg);
                     }
                 } else {
                     $("#moviesListSection").hide();
-                    $("#moviesStatusText").text("Data tidak ditemukan!");
+                    var errMsg = "Data tidak ditemukan!";
+                    $("#moviesStatusText").text(errMsg);
+                    notifyError(errMsg);
                 }
             },
             fail: function () {
                 $("#moviesListSection").hide();
-                $("#moviesStatusText").text("Gagal ketika melakukan pengambilan data dari database!");
+                var errMsg = "Gagal ketika melakukan pengambilan data dari database!";
+                $("#moviesStatusText").text(errMsg);
+                notifyError(errMsg);
+            }
+        });
+    }
+
+    function addMovieTitle() {
+        var inputs = $("#formAddOrEdit").clone();
+        var formData = $("<form>").append(inputs).serialize();
+        $.ajax({
+            type: "POST",
+            url: BASE_URL+"movies",
+            data: formData,
+            dataType: "json",
+            success: function (result) {
+                if (result.status === "success") {
+                    notifySuccess("Sukses menambah entri");
+                } else {
+                    notifyError("Gagal ketika menambah entri, status "+result.status);
+                }
+                getMovieList(1);
+            },
+            fail: function () {
+                notifyError("Gagal ketika menambah entri");
+            }
+        });
+    }
+
+    function editMovieTitle(titleId) {
+        var inputs = $("#formAddOrEdit").clone();
+        var formData = $("<form>").append(inputs).serialize();
+        $.ajax({
+            type: "PUT",
+            url: BASE_URL+"movies/"+titleId,
+            data: formData,
+            dataType: "json",
+            success: function (result) {
+                if (result.status === "success") {
+                    notifySuccess("Sukses mengubah entri "+titleId);
+                } else {
+                    notifyError("Gagal ketika mengubah entri "+titleId+", status "+result.status);
+                }
+                getMovieList(1);
+            },
+            fail: function () {
+                notifyError("Gagal ketika mengubah entri");
+            }
+        });
+    }
+
+    function deleteMovieTitle(titleId) {
+        $.ajax({
+            type: "DELETE",
+            url: BASE_URL+"movies/"+titleId,
+            dataType: "json",
+            success: function (result) {
+                if (result.status === "success") {
+                    notifySuccess("Sukses menghapus entri "+titleId);
+                } else {
+                    notifyError("Gagal ketika menghapus entri "+titleId+", status "+result.status);
+                }
+                getMovieList(1);
+            },
+            fail: function () {
+                notifyError("Gagal ketika menghapus entri "+titleId);
             }
         });
     }
@@ -329,7 +521,10 @@
             dataType: "json",
             success: function (result) {
                 if (result.status === "success") {
-                    $("#mdlPreviewImg").attr("src", result.data.imageUrl);
+                    var imgUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACtWK6eAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAC4xJREFUeJztnVusFVcdh79zuBULEkpPI9JG24SaSq0BCyVphYeamBCTVgmBGuVQsDTaND5U4yWNPogxGo2JxlgIxsYHY2LiBWuNQRqKyoPWaorGAq0IbaQ3LlKp0Ar1YZ2j5+w9M2evmVm3Wb8v+T20nDN7zX/9v7P3zKyZDUIIIYQQQgghhBBCCCGEEEIIIYQQQgghhBBCCCGEEEIIIYQQQgghRFiGgJWhByFEjAwBXwVeB7YGHosQUTFRjvFIEiEolkOSCEG1HJJEZM0gckgSkS0rGUwOSSKyZSuSRIhKJIlIniHH298KbLf4+buBHZavMQwsA24GlgLXAlcCC4DZuN/H3HkNeBk4AxwFDgJ/Bh4FDmD++IkKXLyTDAHvAR4ETlhuX/GXF4CdwGr0h6qStiS5BLgHOGy5PSV8DgN3ATP7ZlUAzSUZwbyFh55opVmOAXcgCmkqyShwwXIbSpzZA1yD6KOpJJuQJF3JaWAtoo+mktzJZEnOA7uB+4E1wGJgLjow9MFM4DLgOuA24HPAXsycDDq/23wPOgWaSrIZeAzYAszzM2RhwXzMafs/Mtj87gSmBRlpxOhiYh6sAZ5gMElED5IkD6YD9wHn0MctayRJPiwFnqJ6fj8QbHQRI0nyYQT4PdVnt64ONrqIkST5MJdqSXaHG1pcjPT8tyTJhxGqP26tDze0OJgFHMGcsp2IJMmHpZQfuB8FZoQbWng+iinERSRJztxH+bxuCTiuoAwxeVWuJMmX6ZRfJzlEpisibqW/GJIkX95H+ZzeEnBcwfguxcV4rOBnJUkelC1Lsb3LNHmGgZew+8wpSbrP+DFpb54LOagQ3EhxIc5TvfBQknSb+ZSvAl4ScFze+TjFRRjk4pAk6Tb7KJ7He0IMZjjEi2LOfRfx6AC/uwOzjHpQtiNJUuKRkv+f1TvIfor/Sqyx2IbeSbrJ+ymevz0hB+WbYxQXYbHldiRJ93g7xXP3dMhB+eYsxUWYW2NbkqRbXE7xvL0YclC+uUhxEepeMZUk3WEW5Wc4s6GscZsgSbqDi/5IClcFkCTdQIKUpA0kSfpIkJK0hSRJGwlSkjaRJOkiQUrSNpIkTSRISVwgSdJDgpTEFZIkLSRISVwiSdJBgpTENZIkDSRISXwgSeJHgpTEF5IkbkL3R3BiKIAkiZcY+iMosRRAksRJLP0RjJgKIEniI6b+CEJsBZAkcRFbf3gnxgJIkniIsT+8EmsBuizJELAI80yyVcBNwFXE+dzbWPvDGzEXoEuSzAFGgV3AKYrHfxp4CPNM5DlhhtlHzP3hhdgLkLokszHfGX8Su/04NfZ7s/0PeRKx94dzUihAqpKsYOovyZwqh4Hlvgc+gRT6wympFCA1STYAr9JMjvGcH9teCFLpD2ekVIBUJNlA+eOU6uYiYSRJqT+ckFoBYpdkBe29cxS9k/j+uJVaf7ROigWIVZLZND/mmCqH8HvgnmJ/tEqqBYhRkvstx1Q3n/WwL+Ok2h+tkXIBYpJkDvancuvmJHCpw32ZSMr90QqpFyAWSUYtx9E0o472o5fU+6MxXShADJLsshxD0+xysA9FdKE/GtGVAoSUZAizTMSnIKfws3arK/1Rmy4VIJQkiyxft60samn8VXSpP2rRtQKEkKTsm4Jdx8c1ka71hzVdLIBvSd5t+XptZVXDcQ9CF/vDiq4WwKckegfpMF0ugC9JdAzSYbpeAB+SDFF+E5SrnERnsbyQQwF8SPJTy9domp/UGGMdcuiPSnIpgGtJNlpuv2k2Wo6vLrn0Ryk5FcClJJcCJyy3XzcngDdY7309cuqPQnIrgEtJPmO57br5VI39rktu/dFHjgVwJcklmPs1XMrx5Njr+CLH/phErgVwJcm7MHf+uZDjHLCs9h7XI9f++B85F8CVJOtwc0/6ugb7Wpec+wNQAVxK0tY7yTnCyEHFmLKhCwWYCewAvljz911+3Dpoue3ePIn/j1UT6UJ/NCL1AiwE9vP/cX+95nZcSTIL+DTwkuX2T2DOVvk8IC8i9f5oTMoFWAn8g/6xP0C9ZRiur5N8CPgx5feun8RcId+Iv+scU5Fyf7RCqgX4CNWf8b8HTKuxXV9rtxZiPoKtwqzKXYSe7h4lqRVgBvBtBmveH479vC0x3OMeC6n1R+ukVIA3Ab/Brnl/hjkOsEWSGFLqDyekUoCbgGexa9rx7KbeZ3pJkk5/OCOFAmzGXAuoI8d4fg3MrfHauUuSQn84JeYCzAC+RTMxJuZ3wPwa48hZkpj7wwuxFuAKYB/tyTGePwEjNcaTqySx9oc3YizAjcAz2DWkTf4KvLnGuHKT5Fri7A+vxFaAUeDfFeNqK08Bb6kxvhwkGQLuBV4hvv7wTiwFmA58o2I8LnIMWFxjrF2W5CrgV0y9T9kQQwFGgL0VY3GZ48CSGmPuoiSjDP6M4WwIXYBlwNGKcfjIi8DSGmPviiQjmDViNvuSDSEL8GH8HG8MklOYxY+2pC7J7cDz2NcrG0IUYDpmWXpoKXrzMrC6xv6kKMk84EHq1yobfBfgcuCRitcNnVeA99bYr5QkuRVzgqJJnbLBZwGWAn+veM1Ych64rcb+xS7JbMyZwjbul88GXwX4INXn1WPLa8CGGvsZqyQrMLfvtlWfbHBdgGnA1ypeJ+ZcAO6ssc8xSTID+ALwH8sxSZAxXBZgAWapeehGb5KLwMdq7HsMkiwBHrcchwTpwVUBbgD+VrH91PKJGjUIJckw8Ema3yIgQXBTgPXA2Yptp5rP16iFb0muwc0qaAlC8wJMA75Ssc0u5Ms16uJLkq2Yazk+6pANbRVgPvDLiu11Kd/E/gkkLiVZCDzsuQbZ0EYB3gE8XbGtLuY7mM/6NriQZD3+vpdEgmBfgHXAvyq20+V8H7Nsxoa2JLkM+EHAfc+GugUYBr5U8fu55EeYZwPb0FSSBdR/wosEsaROAeYDv6j43dzyMGYZhw1NJdlM+1+xIEEKsC3A9ZjbVUM3ZWx5BJhTWel+UpYkG2wKsBZ/pxFTzH7MMnIbUpUkGwYpwDDmuzdCvqWnkj9gjhFsSFGSbJiqAPOAn1f8nNKfA5jnCNuQmiTZUFWA62j+DUm55iBw5aCTMEZKkmRDWQFuB85U/LsydY5g1kbZkIok2VBWAB1vtJNngbdNMQe9T55PQZJsCN1AOeR5zHKcIjZhvnqt98as2CXJhtDNk0tOYJ45PM4VTH4WVdHdizFLkg2hGyen/BO4GXN890LBv6ckSTaEbprcUvXFo6+TjiTZELphlP6kIEk2hG4GpTixS5INoRtBKU/MkmTDq4RvBKU8FzCngicSWpILZESI2zUV+4bc1DNvISU5Q0YcIXwDKFMnJkmOkBF7CT/5ymCJRZJ9ZMR2wk+8MnhikGQnGXEv4SddsUtoSeo8qzhZbiD8hCv2CSnJO8mIIYrXBSnxJ4Qkx7F/qmTy7CT8ZCv1JRntmU+XkjxAhqwm/EQraUhyCxkyBBwm/EQrcUtygIy5i/CTrMQtySYyZibNvxpYCR9XkhzE/kHdneMOwk+wEqcktg/D6yx7CD/BSpySCMxznE4TfoKVdiTZOHl6JUkbrCX85CqSJGq2EX5yFUkSNbrC3p1IEgdMQ5J0KZLEEfq41Z1IEkesRWe3uhJJ4oirgd2En2BFkkTNeuAo4SdZaZbD9F8hlyQtMQPYAhwi/EQrdvkLZn3VjL5ZNUiSFhnC3COwA3iO8JOvFOc45manQe/niE6SrtzGeD3mBqwlmG9WeivwxrHMDDesLLgInMU8DPAZzLv748BvgScwjWzDVsxTbwblbswfSiGyIbp3EiFiQ5IIMQW2kiwPM0whwjGoJNvozjG1EFZMJYnkENlTJonkEGKMXkkkhxA9jEsiOYQoYTmSQwghhBBCCCGEEEIIIYQQQgghhBBCCCGEEEIIIYQQQgghhBBCCCFEYP4LGsFS1woTTe4AAAAASUVORK5CYII=\n";
+                    if (result.data.imageUrl !== "")
+                        imgUrl = result.data.imageUrl;
+                    $("#mdlPreviewImg").attr("src", imgUrl);
                     $("#mdlPreviewTitle").text(result.data.title);
                     $("#mdlPreviewOriginalTitle").text(result.data.originalTitle);
                     $("#mdlPreviewType").text(result.data.type);
@@ -340,9 +535,67 @@
                     $("#mdlPreviewRating").text(result.data.rating);
                     $("#mdlPreviewDescription").text(result.data.description);
                     $("#modalPreviewTitle").modal();
+                } else {
+                    notifyError("Gagal ketika mengambil data untuk titleId "+titleId+", status "+result.status);
                 }
+            },
+            fail: function () {
+                notifyError("Gagal ketika mengambil data untuk titleId "+titleId);
             }
         });
+    }
+
+    function showAddModal() {
+        $("#mdlEditId").val("");
+        $("#mdlEditType").val("");
+        $("#mdlEditTitle").val("");
+        $("#mdlEditOriginalTitle").val("");
+        $("#mdlEditGenres").val("");
+        $("#mdlEditYear").val("");
+        $("#mdlEditReleaseDate").val("");
+        $("#mdlEditRuntimeMinutes").val("");
+        $("#mdlEditRating").val("");
+        $("#mdlEditDescription").val("");
+        $("#mdlEditImageUrl").val("");
+        $("#mdlAddOrEditTitle").text("Tambah Entri");
+        $("#btnAddOrEditConfirm").attr("onclick", "addMovieTitle()");
+        $("#modalAddOrEditTitle").modal();
+    }
+
+    function showEditModal(titleId) {
+        $.ajax({
+            type: "GET",
+            url: BASE_URL+"movies/"+titleId,
+            dataType: "json",
+            success: function (result) {
+                if (result.status === "success") {
+                    $("#mdlEditId").val(result.data.id);
+                    $("#mdlEditType").val(result.data.type);
+                    $("#mdlEditTitle").val(result.data.title);
+                    $("#mdlEditOriginalTitle").val(result.data.originalTitle);
+                    $("#mdlEditGenres").val(result.data.genres);
+                    $("#mdlEditYear").val(result.data.year);
+                    $("#mdlEditReleaseDate").val(result.data.releaseDate);
+                    $("#mdlEditRuntimeMinutes").val(result.data.runtimeMinutes);
+                    $("#mdlEditRating").val(result.data.rating);
+                    $("#mdlEditDescription").val(result.data.description);
+                    $("#mdlEditImageUrl").val(result.data.imageUrl);
+                    $("#mdlAddOrEditTitle").text("Ubah Entri");
+                    $("#btnAddOrEditConfirm").attr("onclick", "editMovieTitle('"+result.data.id+"')");
+                    $("#modalAddOrEditTitle").modal();
+                } else {
+                    notifyError("Gagal ketika mengambil data untuk titleId "+titleId+", status "+result.status);
+                }
+            },
+            fail: function () {
+                notifyError("Gagal ketika mengambil data untuk titleId "+titleId);
+            }
+        });
+    }
+
+    function showDeleteConfirmationModal(titleId) {
+        $("#btnDeleteConfirm").attr("onclick", "deleteMovieTitle('"+titleId+"')");
+        $("#modalDeleteTitle").modal();
     }
 
     function refreshImportStatus() {
@@ -363,8 +616,10 @@
                     progressBar.removeClass("bg-danger");
                     if (status["success"]) {
                         progressBar.addClass("bg-success");
+                        notifySuccess(statusText);
                     } else {
                         progressBar.addClass("bg-danger");
+                        notifyError(statusText);
                     }
                 }
             },
@@ -389,11 +644,11 @@
                     progressBar.removeClass("bg-danger");
                     refreshImportStatus();
                 } else {
-                    alert("Gagal mengirimkan perintah untuk import!");
+                    notifyError("Gagal mengirimkan perintah untuk import!");
                 }
             },
             fail: function () {
-                alert("Connection error when requesting import!");
+                notifyError("Connection error when requesting import!");
             }
         });
     }
@@ -405,9 +660,9 @@
             data: formData,
             success: function (result) {
                 if (result === "OK"){
-                    alert("Berhasil mengubah konfigurasi!");
+                    notifySuccess("Berhasil mengubah konfigurasi!");
                 } else {
-                    alert("Gagal mengubah konfigurasi!");
+                    notifyError("Gagal mengubah konfigurasi!");
                 }
             }
         });
@@ -436,13 +691,13 @@
         $("#btnConfigUpdate").click(function () {
             var username = $("#username").val();
             if (username === ""){
-                alert("Masukkan username!");
+                notifyError("Masukkan username!");
                 return;
             }
             var password = $("#pwd").val();
             var password2 = $("#pwd2").val();
             if (password !== password2) {
-                alert("Password yang mau diganti tidak sama!");
+                notifyError("Password yang mau diganti tidak sama!");
                 return;
             }
             sendConfigChanges($("#configForm").serialize());

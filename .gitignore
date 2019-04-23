@@ -4,3 +4,5 @@ config.json
 *.db
 *.db-journal
 *.exe
+*.zip
+imdbsmws
