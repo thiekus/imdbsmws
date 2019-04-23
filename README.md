@@ -3,9 +3,8 @@ IMDb Simple Movies WebService (imdbsmws) is Simple RESTful API Web Service Serve
 
 ## Setup
 * Build from sources or [download precompiled](https://github.com/thiekus/imdbsmws/releases) releases.
-* For building from sources, you need [Go Compiler](https://golang.org/dl/) and [MINGW64 GCC](https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-posix/seh/) as needed by SQLite. Make sure Go and GCC placed in ```PATH``` environment. Then run ```go build -i -v github.com/thiekus/imdbsmws``` to compile.
 * For using precompiled binaries, just download version that match with your OS, then extract to someplace.
-* Launching server by running ```imdbsmws``` (```imdbsmws32.exe``` or ```imdbsmws64.exe``` for precompiled Windows binary).
+* Launching server by running ```imdbsmws``` (```imdbws32.exe``` or ```imdbws64.exe``` for precompiled Windows binary).
 * After running, visit admin panel at ```http://localhost:33666/admin``` to manage server.
 * For first time login, username is ```admin``` and password is ```admin```.
 * For first time use, you'll need importing data from IMDb datasets.
@@ -19,11 +18,20 @@ IMDb Simple Movies WebService (imdbsmws) is Simple RESTful API Web Service Serve
 ## API Endpoints
 ```
 /movies (Method GET) -> to get Movie List stored in your database.
-/movies/{titleId} (Method Get) -> to get individual Movie information.
+/movies/{titleId} (Method GET) -> to get individual Movie information.
 /movies (Method POST) -> to post new movie entry.
 /movies/{titleId} (Method PUT) -> to edit existing movie entry.
 /movies/{titleId} (Method DELETE) -> to delete existing movie entry.
 ```
+
+## Build From Sources
+You need [Go Compiler](https://golang.org/dl/) and [Mingw64 GCC](https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-posix/seh/) (or [TDM GCC](http://tdm-gcc.tdragon.net/download) for simpler to setup), as needed by SQLite. Make sure Go and GCC placed in ```PATH``` environment (TDM GCC Installer will do this automatically). Then run ```go build -i -v github.com/thiekus/imdbsmws``` to compile. For compilation in windows, just edit and use ```win32_build.bat``` or ```win64_build.bat``` scrtipt.
+
+## Screenshots
+![Screenshoot](https://github.com/thiekus/imdbsmws/raw/master/_screenshots/scshot1.png)
+![Screenshoot](https://github.com/thiekus/imdbsmws/raw/master/_screenshots/scshot2.jpg)
+![Screenshoot](https://github.com/thiekus/imdbsmws/raw/master/_screenshots/scshot3.png)
+![Screenshoot](https://github.com/thiekus/imdbsmws/raw/master/_screenshots/scshot4.png)
 
 ## License
 This application is Licensed under [MIT License](https://github.com/thiekus/imdbsmws/blob/master/LICENSE).
