@@ -2,8 +2,10 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/mux"
 	"math"
+	"math/rand"
 	"net/http"
 	"strconv"
 )
@@ -25,6 +27,11 @@ type WsStatusGetMovies struct {
 	MaxResult  int              `json:"maxResult"`
 	MaxPage    int              `json:"maxPage"`
 	Data       []ImdbTitleEntry `json:"data"`
+}
+
+type WsStatusPostMovie struct {
+	WsStatus
+	Id string `json:"id"`
 }
 
 func parseTitleFormValues(r *http.Request) (ImdbTitleEntry, error) {
@@ -96,7 +103,11 @@ func moviesGetEndpoint(w http.ResponseWriter, r *http.Request) {
 		dataStatus := WsStatusGetMovie{
 			Data: data,
 		}
-		dataStatus.Status = "success"
+		if data.Id == id {
+			dataStatus.Status = "success"
+		} else {
+			dataStatus.Status = "not found"
+		}
 		jsonData, err := json.Marshal(dataStatus)
 		if err != nil {
 			log.Error(err)
@@ -155,7 +166,11 @@ func moviesGetEndpoint(w http.ResponseWriter, r *http.Request) {
 			MaxPage:    maxPage,
 			Data:       result,
 		}
-		resultStatus.Status = "success"
+		if resultStatus.Count > 0 {
+			resultStatus.Status = "success"
+		} else {
+			resultStatus.Status = "not found"
+		}
 		jsonData, err := json.Marshal(resultStatus)
 		if err != nil {
 			log.Error(err)
@@ -174,7 +189,6 @@ func moviesPostEndpoint(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-	log.Printf("%s posting table id=%s", r.RemoteAddr, val.Id)
 	db, err := OpenDefaultDatabase()
 	if err != nil {
 		log.Error(err)
@@ -182,13 +196,25 @@ func moviesPostEndpoint(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer db.Close()
+	if val.Id == "" {
+		for {
+			newId := fmt.Sprintf("tt%.7d", rand.Intn(9999998)+1)
+			data, err := db.GetTitleById(newId)
+			if err != nil || data.Id != newId {
+				val.Id = newId
+				break
+			}
+		}
+	}
+	log.Printf("%s posting table id=%s", r.RemoteAddr, val.Id)
 	err = db.InsertTitleOnce(val)
 	if err != nil {
 		log.Error(err)
 		http.Error(w, err.Error(), 409)
 		return
 	}
-	status := WsStatus{Status: "success"}
+	status := WsStatusPostMovie{Id: val.Id}
+	status.Status = "success"
 	data, err := json.Marshal(status)
 	if err != nil {
 		log.Error(err)
