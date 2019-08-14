@@ -1,4 +1,6 @@
 # IMDb Simple Movies WebService
+[![Build Status](https://travis-ci.org/thiekus/imdbsmws.svg?branch=master)](https://travis-ci.org/thiekus/imdbsmws)
+
 IMDb Simple Movies WebService (imdbsmws) is Simple RESTful API Web Service Server that manages and retriving titles data from imdb.com
 
 ## Setup
